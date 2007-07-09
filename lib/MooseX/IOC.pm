@@ -4,7 +4,7 @@ use Moose;
 
 use MooseX::IOC::Meta::Attribute;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 1;
 
@@ -57,7 +57,7 @@ MooseX::IOC - Moose attributes with IOC integration
 =head1 DESCRIPTION
 
 This module provides a bridge between IOC registries and Moose objects through a 
-custom attribute metaclass. It replaces the C<default> option with a C<service>
+custom attribute metaclass. It compliments the C<default> option with a C<service>
 option which contains a L<IOC::Registry> path (and optional parameters). 
 
 The C<service> option can be in one of the following formats:
@@ -101,6 +101,10 @@ expected to return an ARRAY ref similar to the above version.
   );
 
 =back
+
+If the C<service> is not found and a C<default> option has been set, then 
+it will return the value in C<default>. This can be useful for writing 
+code which can potentially be run both under IOC and not under IOC.
 
 =head1 METHODS
 

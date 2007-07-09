@@ -3,7 +3,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 13;
+use Test::Exception;
+
+use Scalar::Util qw/reftype/;
 
 use IOC;
 use IOC::Registry;
@@ -58,7 +61,31 @@ BEGIN {
         service   => sub {
             [ '/MyApp/loc' => (locale => $_[0]->default_locale) ]
         },
-    );   
+    );
+
+    has missing => (
+        metaclass => "IOC",
+        is        => "ro",
+        lazy      => 1,
+        service   => "/MyApp/missing",
+    );
+
+    has not_missing => (
+        metaclass => "IOC",
+        is        => "ro",
+        lazy      => 1,
+        default   => "blah",
+        service   => "/MyApp/missing",
+    );
+
+    has default_not_used => (
+        metaclass => 'IOC',
+        is        => 'ro',
+        isa       => 'MyDbh',
+        service   => '/MyApp/dbh',
+        default   => sub { bless([],'MyDbh') },
+    );
+    
     
     sub default_locale { 'en' }   
 }
@@ -79,4 +106,12 @@ isa_ok($app->loc, 'Myi18n');
 
 is($app->logger->{log_file}, 'foo.log', '... parameters passed succcefully');
 is($app->loc->{locale}, 'en', '... parameters passed succcefully');
+
+throws_ok { $app->missing } qr/ServiceNotFound/, "can't get missing field";
+
+lives_ok { $app->not_missing } "... unless it has a default";
+
+is( eval { $app->not_missing }, "blah", "default value given" );
+
+is( reftype($app->default_not_used), "HASH", "default not used" );
 

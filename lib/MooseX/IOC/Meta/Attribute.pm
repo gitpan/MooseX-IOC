@@ -4,7 +4,7 @@ use Moose;
 
 use IOC::Registry;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 extends 'Moose::Meta::Attribute';
 
@@ -16,17 +16,26 @@ around '_process_options' => sub {
     my $next = shift;
     my ($self, $name, $options) = @_;
     if (exists $options->{service}) {
-        (!exists $options->{default})
-            || confess "You cannot assign a 'default' and a 'service' in the same attribute";
         
         my $service = $self->_process_service($options->{service});
         
-        $options->{default} = sub { 
-            $REGISTRY->locateService(@{$service->(@_)}) 
-        };
+        if (exists $options->{default}) {
+            my $default = $options->{default};
+            $options->{default} = sub {
+                local $@;
+                eval { $self->_locate_ioc_service($service, @_) } || $default;
+            }
+        } else {
+            $options->{default} = sub { $self->_locate_ioc_service($service, @_) };
+        }
     }
     $next->($self, $name, $options);
 };
+
+sub _locate_ioc_service {
+    my ( $self, $service, @args ) = @_;
+    $REGISTRY->locateService(@{$service->(@args)}) 
+}
 
 sub _process_service {
     my ($self, $service) = @_;

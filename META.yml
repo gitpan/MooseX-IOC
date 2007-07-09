@@ -1,6 +1,6 @@
 ---
 name: MooseX-IOC
-version: 0.01
+version: 0.02
 author:
   - 'Stevan Little E<lt>stevan@iinteractive.comE<gt>'
 abstract: Moose attributes with IOC integration
@@ -18,10 +18,10 @@ provides:
     file: lib/MooseX/IOC/Meta/Attribute.pm
   MooseX::IOC:
     file: lib/MooseX/IOC.pm
-    version: 0.01
+    version: 0.02
   MooseX::IOC::Meta::Attribute:
     file: lib/MooseX/IOC/Meta/Attribute.pm
-    version: 0.01
+    version: 0.02
 generated_by: Module::Build version 0.2805
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
