@@ -10,4 +10,3 @@ lib/MooseX/IOC/Meta/Attribute.pm
 t/000_load.t
 t/001_basic.t
 t/pod.t
-t/pod_coverage.t

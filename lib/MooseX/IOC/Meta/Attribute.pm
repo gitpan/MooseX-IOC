@@ -4,11 +4,11 @@ use Moose;
 
 use IOC::Registry;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 extends 'Moose::Meta::Attribute';
 
-# this never changes, so we can 
+# this never changes, so we can
 # just store it once - SL
 my $REGISTRY = IOC::Registry->new;
 
@@ -16,9 +16,9 @@ around '_process_options' => sub {
     my $next = shift;
     my ($self, $name, $options) = @_;
     if (exists $options->{service}) {
-        
+
         my $service = $self->_process_service($options->{service});
-        
+
         if (exists $options->{default}) {
             my $default = $options->{default};
             $options->{default} = sub {
@@ -28,21 +28,23 @@ around '_process_options' => sub {
         } else {
             $options->{default} = sub { $self->_locate_ioc_service($service, @_) };
         }
+
+        delete $options->{service};
     }
     $next->($self, $name, $options);
 };
 
 sub _locate_ioc_service {
     my ( $self, $service, @args ) = @_;
-    $REGISTRY->locateService(@{$service->(@args)}) 
+    $REGISTRY->locateService(@{$service->(@args)})
 }
 
 sub _process_service {
     my ($self, $service) = @_;
-    return $service 
+    return $service
         if ref $service eq 'CODE';
     # otherwise ...
-    $service = [ $service ] if ref $service ne 'ARRAY';    
+    $service = [ $service ] if ref $service ne 'ARRAY';
     return sub { $service };
 }
 
@@ -62,7 +64,7 @@ MooseX::IOC::Meta::Attribute
 
 =head1 DESCRIPTION
 
-No real user serviceable parts in here ... see L<MooseX::IOC> docs. 
+No real user serviceable parts in here ... see L<MooseX::IOC> docs.
 
 =head1 METHODS
 
@@ -76,7 +78,7 @@ This returns the role meta object.
 
 =head1 BUGS
 
-All complex software has bugs lurking in it, and this module is no 
+All complex software has bugs lurking in it, and this module is no
 exception. If you find a bug please either email me, or add the bug
 to cpan-RT.
 
@@ -86,7 +88,7 @@ Stevan Little E<lt>stevan@iinteractive.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2007 by Infinity Interactive, Inc.
+Copyright 2007-2009 by Infinity Interactive, Inc.
 
 L<http://www.iinteractive.com>
 
